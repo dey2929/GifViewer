@@ -23,7 +23,7 @@ import GifViewer.request.target.Target;
 public class GlideContext extends ContextWrapper implements ComponentCallbacks2 {
   private final Handler mainHandler;
   private final Registry registry;
-  private final ImageViewTargetFactory imageViewTargetFactory;
+  private static ImageViewTargetFactory imageViewTargetFactory;
   private final RequestOptions defaultRequestOptions;
   private final Engine engine;
   private final ComponentCallbacks2 componentCallbacks;

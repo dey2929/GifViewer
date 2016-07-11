@@ -48,7 +48,7 @@ import java.io.File;
 public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType> implements Cloneable {
     protected final Class<ModelType> modelClass;
     protected final Context context;
-    protected final Glide glide;
+    protected final GifViewer glide;
     protected final Class<TranscodeType> transcodeClass;
     protected final RequestTracker requestTracker;
     protected final Lifecycle lifecycle;
@@ -89,7 +89,7 @@ public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeT
 
     GenericRequestBuilder(Context context, Class<ModelType> modelClass,
             LoadProvider<ModelType, DataType, ResourceType, TranscodeType> loadProvider,
-            Class<TranscodeType> transcodeClass, Glide glide, RequestTracker requestTracker, Lifecycle lifecycle) {
+            Class<TranscodeType> transcodeClass, GifViewer glide, RequestTracker requestTracker, Lifecycle lifecycle) {
         this.context = context;
         this.modelClass = modelClass;
         this.transcodeClass = transcodeClass;
@@ -242,22 +242,7 @@ public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeT
         return this;
     }
 
-    /**
-     * Sets the {@link GifViewer.load.engine.DiskCacheStrategy} to use for this load. Defaults to
-     * {@link GifViewer.load.engine.DiskCacheStrategy#RESULT}.
-     *
-     * <p>
-     *     For most applications {@link GifViewer.load.engine.DiskCacheStrategy#RESULT} is ideal.
-     *     Applications that use the same resource multiple times in multiple sizes and are willing to trade off some
-     *     speed and disk space in return for lower bandwidth usage may want to consider using
-     *     {@link GifViewer.load.engine.DiskCacheStrategy#SOURCE} or
-     *     {@link GifViewer.load.engine.DiskCacheStrategy#RESULT}. Any download only operations should
-     *     typically use {@link GifViewer.load.engine.DiskCacheStrategy#SOURCE}.
-     * </p>
-     *
-     * @param strategy The strategy to use.
-     * @return This request builder.
-     */
+
     public GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType>  diskCacheStrategy(
             DiskCacheStrategy strategy) {
         this.diskCacheStrategy = strategy;
@@ -265,19 +250,8 @@ public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeT
         return this;
     }
 
-    /**
-     * Sets the {@link GifViewer.load.Encoder} to use to encode the original data directly to cache. Will only
-     * be used if the original data is not already in cache and if the
-     * {@link GifViewer.load.engine.DiskCacheStrategy} is set to
-     * {@link GifViewer.load.engine.DiskCacheStrategy#SOURCE} or
-     * {@link GifViewer.load.engine.DiskCacheStrategy#ALL}.
-     *
-     * @see #sourceEncoder(GifViewer.load.Encoder)
-     * @see GifViewer.load.engine.DiskCacheStrategy
-     *
-     * @param encoder The encoder to use.
-     * @return This request builder.
-     */
+
+
     public GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeType> encoder(
             ResourceEncoder<ResourceType> encoder) {
         // loadProvider will be null if model is null, in which case we're not going to load anything so it's ok to
@@ -680,18 +654,10 @@ public class GenericRequestBuilder<ModelType, DataType, ResourceType, TranscodeT
         return target;
     }
 
-    /**
-     * Preloads the resource into the cache using the given width and height.
-     *
-     * <p>
-     *     Pre-loading is useful for making sure that resources you are going to to want in the near future are
-     *     available quickly.
-     * </p>
-     *
-     * @see GifViewer.ListPreloader
-     */
+
     public Target<TranscodeType> preload(int width, int height) {
-        final PreloadTarget<TranscodeType> target = PreloadTarget.obtain(width, height);
+
+        final PreloadTarget<TranscodeType> target = PreloadTarget.obtain(width,height);
         return into(target);
     }
 

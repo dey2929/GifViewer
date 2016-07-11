@@ -103,7 +103,7 @@ public class GifViewer implements ComponentCallbacks2
      * @param context A context.
      * @see #getPhotoCacheDir(android.content.Context, String)
      */
-    @Nullable
+
     public static File getPhotoCacheDir(Context context) {
         return getPhotoCacheDir(context, DEFAULT_DISK_CACHE_DIR);
     }
@@ -116,7 +116,7 @@ public class GifViewer implements ComponentCallbacks2
      * @param cacheName The name of the subdirectory in which to store the cache.
      * @see #getPhotoCacheDir(android.content.Context)
      */
-    @Nullable
+
     public static File getPhotoCacheDir(Context context, String cacheName) {
         File cacheDir = context.getCacheDir();
         if (cacheDir != null) {
@@ -140,7 +140,7 @@ public class GifViewer implements ComponentCallbacks2
      */
     public static GifViewer get(Context context) {
         if (gifViewer == null) {
-            synchronized (Glide.class) {
+            synchronized (GifViewer.class) {
                 if (gifViewer == null) {
                     Context applicationContext = context.getApplicationContext();
                     List<GlideModule> modules = new ManifestParser(applicationContext).parse();

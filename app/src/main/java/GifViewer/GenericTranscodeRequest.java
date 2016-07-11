@@ -35,8 +35,9 @@ public class GenericTranscodeRequest<ModelType, DataType, ResourceType>
     private final Class<ResourceType> resourceClass;
     private final RequestManager.OptionsApplier optionsApplier;
 
-    private static <A, T, Z, R> LoadProvider<A, T, Z, R> build(Glide glide, ModelLoader<A, T> modelLoader,
-            Class<T> dataClass, Class<Z> resourceClass, ResourceTranscoder<Z, R> transcoder) {
+    private static <A, T, Z, R> LoadProvider<A, T, Z, R> build(GifViewer glide, ModelLoader<A, T> modelLoader,
+            Class<T> dataClass, Class<Z> resourceClass, ResourceTranscoder<Z, R> transcoder)
+    {
         DataLoadProvider<T, Z> dataLoadProvider = glide.buildDataProvider(dataClass, resourceClass);
         return new FixedLoadProvider<A, T, Z, R>(modelLoader, transcoder, dataLoadProvider);
     }
@@ -53,9 +54,10 @@ public class GenericTranscodeRequest<ModelType, DataType, ResourceType>
         this.optionsApplier = optionsApplier;
     }
 
-    GenericTranscodeRequest(Context context, Glide glide, Class<ModelType> modelClass,
+    GenericTranscodeRequest(Context context, GifViewer glide, Class<ModelType> modelClass,
             ModelLoader<ModelType, DataType> modelLoader, Class<DataType> dataClass, Class<ResourceType> resourceClass,
-            RequestTracker requestTracker, Lifecycle lifecycle, RequestManager.OptionsApplier optionsApplier) {
+            RequestTracker requestTracker, Lifecycle lifecycle, RequestManager.OptionsApplier optionsApplier)
+    {
         super(context, modelClass, build(glide, modelLoader, dataClass, resourceClass,
                         UnitTranscoder.<ResourceType>get()), resourceClass, glide, requestTracker, lifecycle);
         this.modelLoader = modelLoader;

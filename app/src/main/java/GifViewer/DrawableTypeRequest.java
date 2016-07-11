@@ -31,7 +31,7 @@ public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<Model
     private final ModelLoader<ModelType, ParcelFileDescriptor> fileDescriptorModelLoader;
     private final RequestManager.OptionsApplier optionsApplier;
 
-    private static <A, Z, R> FixedLoadProvider<A, ImageVideoWrapper, Z, R> buildProvider(Glide glide,
+    private static <A, Z, R> FixedLoadProvider<A, ImageVideoWrapper, Z, R> buildProvider(GifViewer glide,
             ModelLoader<A, InputStream> streamModelLoader,
             ModelLoader<A, ParcelFileDescriptor> fileDescriptorModelLoader, Class<Z> resourceClass,
             Class<R> transcodedClass,

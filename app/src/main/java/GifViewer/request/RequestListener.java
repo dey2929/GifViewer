@@ -1,7 +1,5 @@
 package GifViewer.request;
 
-import android.support.annotation.Nullable;
-
 import GifViewer.load.DataSource;
 import GifViewer.load.engine.GlideException;
 import GifViewer.request.target.Target;
@@ -42,7 +40,7 @@ public interface RequestListener<R> {
    * @return {@code true} if the listener has handled updating the target for the given exception,
    *         {@code false} to allow Glide's request to update the target.
    */
-  boolean onLoadFailed(@Nullable GlideException e, Object model, Target<R> target,
+  boolean onLoadFailed( GlideException e, Object model, Target<R> target,
       boolean isFirstResource);
 
   /**

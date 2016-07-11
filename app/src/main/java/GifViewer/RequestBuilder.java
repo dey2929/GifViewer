@@ -46,17 +46,17 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
   private final Class<TranscodeType> transcodeClass;
   private final BaseRequestOptions<?> defaultRequestOptions;
 
-  @NonNull private BaseRequestOptions<?> requestOptions;
+  private BaseRequestOptions<?> requestOptions;
   @SuppressWarnings("unchecked")
   private TransitionOptions<?, ? super TranscodeType> transitionOptions =
       (TransitionOptions<?, ? super TranscodeType>) DEFAULT_ANIMATION_OPTIONS;
 
-  @Nullable private Object model;
+private Object model;
   // model may occasionally be null, so to enforce that load() was called, put a boolean rather
   // than relying on model not to be null.
-  @Nullable private RequestListener<TranscodeType> requestListener;
-  @Nullable private RequestBuilder<TranscodeType> thumbnailBuilder;
-  @Nullable private Float thumbSizeMultiplier;
+   private RequestListener<TranscodeType> requestListener;
+   private RequestBuilder<TranscodeType> thumbnailBuilder;
+  private Float thumbSizeMultiplier;
   private boolean isModelSet;
   private boolean isThumbnailBuilt;
 
@@ -261,7 +261,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
    *
    * @param file The File containing the image
    */
-  public RequestBuilder<TranscodeType> load(@Nullable File file) {
+  public RequestBuilder<TranscodeType> load( File file) {
     return loadGeneric(file);
   }
 
@@ -284,7 +284,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
    * @see #load(Integer)
    * @see GifViewer.signature.ApplicationVersionSignature
    */
-  public RequestBuilder<TranscodeType> load(@Nullable Integer resourceId) {
+  public RequestBuilder<TranscodeType> load(Integer resourceId) {
     return loadGeneric(resourceId).apply(signatureOf(ApplicationVersionSignature.obtain(context)));
   }
 
@@ -298,7 +298,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
    * {@link #load(android.net.Uri)} or {@link #load(String)}.
    */
   @Deprecated
-  public RequestBuilder<TranscodeType> load(@Nullable URL url) {
+  public RequestBuilder<TranscodeType> load(URL url) {
     return loadGeneric(url);
   }
 
@@ -311,7 +311,7 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
    * @param model the data to load.
    * @see #load(Object)
    */
-  public RequestBuilder<TranscodeType> load(@Nullable byte[] model) {
+  public RequestBuilder<TranscodeType> load( byte[] model) {
     return loadGeneric(model).apply(signatureOf(new ObjectKey(UUID.randomUUID().toString()))
         .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true /*skipMemoryCache*/));
   }
@@ -475,24 +475,6 @@ public class RequestBuilder<TranscodeType> implements Cloneable {
     return target;
   }
 
-  /**
-   * Preloads the resource into the cache using the given width and height.
-   *
-   * <p> Pre-loading is useful for making sure that resources you are going to to want in the near
-   * future are available quickly. </p>
-   *
-   * @param width  The desired width in pixels, or {@link Target#SIZE_ORIGINAL}. This will be
-   *               overridden by
-   *               {@link GifViewer.request.BaseRequestOptions#override(int, int)} if
-   *               previously called.
-   * @param height The desired height in pixels, or {@link Target#SIZE_ORIGINAL}. This will be
-   *               overridden by
-   *               {@link GifViewer.request.BaseRequestOptions#override(int, int)}} if
-   *               previously called).
-   * @return A {@link Target} that can be used to cancel the load via
-   * {@link RequestManager#clear(Target)}.
-   * @see GifViewer.ListPreloader
-   */
   public Target<TranscodeType> preload(int width, int height) {
     final PreloadTarget<TranscodeType> target = PreloadTarget.obtain(requestManager, width, height);
     return into(target);

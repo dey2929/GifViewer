@@ -1,7 +1,6 @@
 package GifViewer.request.transition;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.view.View;
 
 /**
@@ -31,7 +30,7 @@ public interface Transition<R> {
      * Returns the current drawable being displayed in the view, or null if no such drawable exists
      * (or one cannot be retrieved).
      */
-    @Nullable
+
     Drawable getCurrentDrawable();
 
     /**

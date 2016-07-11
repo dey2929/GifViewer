@@ -22,10 +22,10 @@ import java.io.InputStream;
 public class BitmapTypeRequest<ModelType> extends BitmapRequestBuilder<ModelType, Bitmap> {
     private final ModelLoader<ModelType, InputStream> streamModelLoader;
     private final ModelLoader<ModelType, ParcelFileDescriptor> fileDescriptorModelLoader;
-    private final Glide glide;
+    private final GifViewer glide;
     private final RequestManager.OptionsApplier optionsApplier;
 
-    private static <A, R> FixedLoadProvider<A, ImageVideoWrapper, Bitmap, R> buildProvider(Glide glide,
+    private static <A, R> FixedLoadProvider<A, ImageVideoWrapper, Bitmap, R> buildProvider(GifViewer glide,
             ModelLoader<A, InputStream> streamModelLoader,
             ModelLoader<A, ParcelFileDescriptor> fileDescriptorModelLoader,
             Class<R> transcodedClass, ResourceTranscoder<Bitmap, R> transcoder) {

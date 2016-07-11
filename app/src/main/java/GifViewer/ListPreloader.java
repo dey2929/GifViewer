@@ -1,15 +1,14 @@
 package GifViewer;
 
-import android.support.annotation.Nullable;
 import android.widget.AbsListView;
+
+import java.util.List;
+import java.util.Queue;
 
 import GifViewer.request.target.BaseTarget;
 import GifViewer.request.target.SizeReadyCallback;
 import GifViewer.request.transition.Transition;
 import GifViewer.util.Util;
-
-import java.util.List;
-import java.util.Queue;
 
 /**
  * Loads a few resources ahead in the direction of scrolling in any {@link AbsListView} so that
@@ -86,12 +85,12 @@ public class ListPreloader<T> implements AbsListView.OnScrollListener {
      *
      * @param item A model
      */
-    @Nullable
+
     int[] getPreloadSize(T item, int adapterPosition, int perItemPosition);
   }
 
   /**
-   * Constructor for {@link GifViewer.ListPreloader} that accepts interfaces for providing
+   * Constructor for {@link GifViewer} that accepts interfaces for providing
    * the dimensions of images to preload, the list of models to preload for a given position, and
    * the request to use to load images.
    *

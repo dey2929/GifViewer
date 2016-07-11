@@ -42,7 +42,7 @@ public class DrawableRequestBuilder<ModelType>
         implements BitmapOptions, DrawableOptions {
 
     DrawableRequestBuilder(Context context, Class<ModelType> modelClass,
-            LoadProvider<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable> loadProvider, Glide glide,
+            LoadProvider<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable> loadProvider, GifViewer glide,
             RequestTracker requestTracker, Lifecycle lifecycle) {
         super(context, modelClass, loadProvider, GlideDrawable.class, glide, requestTracker, lifecycle);
         // Default to animating.
@@ -174,10 +174,10 @@ public class DrawableRequestBuilder<ModelType>
      * @return This request builder.
      */
     @SuppressWarnings("unchecked")
-    public DrawableRequestBuilder<ModelType> centerCrop() {
+  /*  public DrawableRequestBuilder<ModelType> centerCrop() {
         return transform(glide.getDrawableCenterCrop());
     }
-
+*/
     /**
      * Transform {@link GlideDrawable}s using {@link GifViewer.load.resource.bitmap.FitCenter}.
      *
@@ -188,10 +188,10 @@ public class DrawableRequestBuilder<ModelType>
      *
      * @return This request builder.
      */
-    @SuppressWarnings("unchecked")
-    public DrawableRequestBuilder<ModelType> fitCenter() {
+    /*@SuppressWarnings("unchecked")*/
+   /* public DrawableRequestBuilder<ModelType> fitCenter() {
         return transform(glide.getDrawableFitCenter());
-    }
+    }*/
 
     /**
      * Transform {@link GlideDrawable}s using the given {@link android.graphics.Bitmap} transformations. Replaces any
@@ -443,5 +443,15 @@ public class DrawableRequestBuilder<ModelType>
     @Override
     void applyCenterCrop() {
         centerCrop();
+    }
+
+    @Override
+    public GenericRequestBuilder<?, ?, ?, ?> fitCenter() {
+        return null;
+    }
+
+    @Override
+    public GenericRequestBuilder<?, ?, ?, ?> centerCrop() {
+        return null;
     }
 }

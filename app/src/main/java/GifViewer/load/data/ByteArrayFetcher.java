@@ -3,10 +3,13 @@ package GifViewer.load.data;
 /**
  * Created by jabong on 8/7/16.
  */
-import GifViewer.Priority;
-import GifViewer.load.data.DataFetcher;
+import android.renderscript.RenderScript;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import GifViewer.Priority;
+import GifViewer.load.DataSource;
 
 public class ByteArrayFetcher implements DataFetcher<InputStream> {
     private final byte[] bytes;
@@ -21,6 +24,11 @@ public class ByteArrayFetcher implements DataFetcher<InputStream> {
         return new ByteArrayInputStream(this.bytes);
     }
 
+    @Override
+    public void loadData(RenderScript.Priority priority, DataCallback<? super InputStream> callback) {
+
+    }
+
     public void cleanup() {
     }
 
@@ -29,5 +37,15 @@ public class ByteArrayFetcher implements DataFetcher<InputStream> {
     }
 
     public void cancel() {
+    }
+
+    @Override
+    public Class<InputStream> getDataClass() {
+        return null;
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return null;
     }
 }
