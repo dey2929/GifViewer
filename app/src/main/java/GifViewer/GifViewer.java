@@ -324,7 +324,7 @@ public class GifViewer implements ComponentCallbacks2
         mainHandler = new Handler(Looper.getMainLooper());
         bitmapPreFiller = new BitmapPreFiller(memoryCache, bitmapPool, decodeFormat);
 
-        dataLoadProviderRegistry = new DataLoadProviderRegistry();
+
 
         StreamBitmapDataLoadProvider streamBitmapLoadProvider =
                 new StreamBitmapDataLoadProvider(bitmapPool, decodeFormat);
