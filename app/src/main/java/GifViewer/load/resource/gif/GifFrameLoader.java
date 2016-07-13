@@ -7,10 +7,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 
+import GifViewer.GifViewer;
 import GifViewer.Glide;
 import GifViewer.RequestBuilder;
 import GifViewer.RequestManager;
-import GifViewer.gifdecoder.GifDecoder;
+import GifViewer.GifDecoder;
 import GifViewer.load.Key;
 import GifViewer.load.Transformation;
 import GifViewer.load.engine.DiskCacheStrategy;
@@ -52,19 +53,19 @@ class GifFrameLoader {
   }
 
   public GifFrameLoader(
-      Glide glide,
+          GifViewer gifViewer,
       GifDecoder gifDecoder,
       int width,
       int height,
       Transformation<Bitmap> transformation,
       Bitmap firstFrame) {
+
     this(
-        glide.getContext(),
-        glide.getBitmapPool(),
-        Glide.with(glide.getContext()),
+        gifViewer.getContext(),gifViewer.getBitmapPool(),
+        GifViewer.with(gifViewer.getContext()),
         gifDecoder,
         null /*handler*/,
-        getRequestBuilder(Glide.with(glide.getContext()), width, height),
+        getRequestBuilder(GifViewer.with(gifViewer.getContext()), width, height),
         transformation,
         firstFrame);
   }
@@ -79,6 +80,7 @@ class GifFrameLoader {
       RequestBuilder<Bitmap> requestBuilder,
       Transformation<Bitmap> transformation,
       Bitmap firstFrame) {
+
     this.requestManager = requestManager;
     if (handler == null) {
       handler = new Handler(Looper.getMainLooper(), new FrameLoaderCallback());

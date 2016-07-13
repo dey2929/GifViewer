@@ -3,6 +3,10 @@ package GifViewer;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Animation;
+
+import java.io.File;
+import java.io.InputStream;
+
 import GifViewer.load.Encoder;
 import GifViewer.load.Key;
 import GifViewer.load.ResourceDecoder;
@@ -10,6 +14,7 @@ import GifViewer.load.ResourceEncoder;
 import GifViewer.load.Transformation;
 import GifViewer.load.engine.DiskCacheStrategy;
 import GifViewer.load.resource.bitmap.BitmapTransformation;
+import GifViewer.load.resource.drawable.GlideDrawable;
 import GifViewer.load.resource.gif.GifDrawable;
 import GifViewer.load.resource.gif.GifDrawableTransformation;
 import GifViewer.load.resource.transcode.ResourceTranscoder;
@@ -17,9 +22,6 @@ import GifViewer.provider.LoadProvider;
 import GifViewer.request.RequestListener;
 import GifViewer.request.animation.DrawableCrossFadeFactory;
 import GifViewer.request.animation.ViewPropertyAnimation;
-
-import java.io.File;
-import java.io.InputStream;
 
 /**
  * A class for creating a request to load an animated gif.
@@ -343,7 +345,7 @@ public class GifRequestBuilder<ModelType>
      */
     @Override
     public GifRequestBuilder<ModelType> listener(
-            RequestListener<? super ModelType, GifDrawable> requestListener) {
+            RequestListener<? super ModelType, GlideDrawable> requestListener) {
         super.listener(requestListener);
         return this;
     }

@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+
+import java.io.File;
+
 import GifViewer.load.Encoder;
 import GifViewer.load.Key;
 import GifViewer.load.ResourceDecoder;
@@ -24,8 +27,6 @@ import GifViewer.request.RequestListener;
 import GifViewer.request.animation.DrawableCrossFadeFactory;
 import GifViewer.request.animation.ViewPropertyAnimation;
 import GifViewer.request.target.Target;
-
-import java.io.File;
 
 /**
  * A class for creating a request to load a {@link GlideDrawable}.
@@ -350,8 +351,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> listener(
-            RequestListener<? super ModelType, GlideDrawable> requestListener) {
+    public DrawableRequestBuilder<ModelType> listener(RequestListener<? super ModelType , GlideDrawable> requestListener)
+    {
         super.listener(requestListener);
         return this;
     }

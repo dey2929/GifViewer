@@ -15,13 +15,13 @@ import android.os.Build;
 import android.support.annotation.VisibleForTesting;
 import android.view.Gravity;
 
-import GifViewer.Glide;
-import GifViewer.gifdecoder.GifDecoder;
+import java.nio.ByteBuffer;
+
+import GifViewer.GifDecoder;
+import GifViewer.GifViewer;
 import GifViewer.load.Transformation;
 import GifViewer.load.engine.bitmap_recycle.BitmapPool;
 import GifViewer.util.Preconditions;
-
-import java.nio.ByteBuffer;
 
 /**
  * An animated {@link Drawable} that plays the frames of an animated GIF.
@@ -101,7 +101,7 @@ public class GifDrawable extends Drawable implements GifFrameLoader.FrameCallbac
             bitmapPool,
             new GifFrameLoader(
                 // TODO(b/27524013): Factor out this call to Glide.get()
-                Glide.get(context),
+                GifViewer.get(context),
                 gifDecoder,
                 targetFrameWidth,
                 targetFrameHeight,
