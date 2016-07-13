@@ -8,8 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
 import android.view.View;
 
 import java.io.File;
@@ -51,7 +50,7 @@ public class RequestManager implements LifecycleListener {
     private static final RequestOptions DOWNLOAD_ONLY_OPTIONS =
             diskCacheStrategyOf(DiskCacheStrategy.DATA).priority(Priority.LOW)
                     .skipMemoryCache(true);
-
+    private DefaultOptions options;
     private final GifViewer gifViewer;
     private final Lifecycle lifecycle;
     private final RequestTracker requestTracker;
@@ -66,10 +65,28 @@ public class RequestManager implements LifecycleListener {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ConnectivityMonitor connectivityMonitor;
 
-    @NonNull
     private BaseRequestOptions<?> defaultRequestOptions;
-    @NonNull
+
     private BaseRequestOptions<?> requestOptions;
+
+    class OptionsApplier {
+
+        public <A, X extends GenericRequestBuilder<A, ?, ?, ?>> X apply(X builder) {
+            if (options != null) {
+                options.apply(builder);
+            }
+            return builder;
+        }
+    }
+    public interface DefaultOptions {
+        /**
+         * Allows the implementor to apply some options to the given request.
+         *
+         * @param requestBuilder The request builder being used to construct the load.
+         * @param <T> The type of the model.
+         */
+        <T> void apply(GenericRequestBuilder<T, ?, ?, ?> requestBuilder);
+    }
 
     public RequestManager(GifViewer gifViewer, Lifecycle lifecycle, RequestManagerTreeNode treeNode) {
         this(gifViewer, lifecycle, treeNode, new RequestTracker(), gifViewer.getConnectivityMonitorFactory());
@@ -329,7 +346,7 @@ public class RequestManager implements LifecycleListener {
      *
      * @return A new request builder for loading a {@link Drawable} using the given model.
      */
-    public RequestBuilder<Drawable> load(@Nullable Object model) {
+    public RequestBuilder<Drawable> load( Object model) {
         return asDrawable().load(model);
     }
 
@@ -358,7 +375,7 @@ public class RequestManager implements LifecycleListener {
      *
      * @return A new request builder for loading a {@link Drawable} using the given model.
      */
-    public RequestBuilder<File> download(@Nullable Object model) {
+    public RequestBuilder<File> download( Object model) {
         return downloadOnly().load(model);
     }
 
@@ -409,7 +426,7 @@ public class RequestManager implements LifecycleListener {
      *
      * @param target The Target to cancel loads for.
      */
-    public void clear(@Nullable final Target<?> target) {
+    public void clear( final Target<?> target) {
         if (target == null) {
             return;
         }
@@ -490,4 +507,6 @@ public class RequestManager implements LifecycleListener {
             // Do nothing.
         }
     }
+
+    
 }

@@ -35,8 +35,10 @@ public class GifRequestBuilder<ModelType>
         extends GenericRequestBuilder<ModelType, InputStream, GifDrawable, GifDrawable>
         implements BitmapOptions, DrawableOptions {
 
+
+
     GifRequestBuilder(LoadProvider<ModelType, InputStream, GifDrawable, GifDrawable> loadProvider,
-            Class<GifDrawable> transcodeClass, GenericRequestBuilder<ModelType, ?, ?, ?> other) {
+                      Class<GifDrawable> transcodeClass, GenericRequestBuilder<ModelType, ?, ?, ?> other) {
         super(loadProvider, transcodeClass, other);
     }
 

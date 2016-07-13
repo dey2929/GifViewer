@@ -5,7 +5,11 @@ import GifViewer.load.EncodeStrategy;
 
 /**
  * Set of available caching strategies for media.
+ *
+ *
  */
+
+
 public abstract class DiskCacheStrategy {
 
   /**
@@ -175,3 +179,5 @@ public abstract class DiskCacheStrategy {
    */
   public abstract boolean decodeCachedData();
 }
+
+

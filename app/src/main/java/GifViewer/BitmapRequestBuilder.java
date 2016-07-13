@@ -57,7 +57,7 @@ public class BitmapRequestBuilder<ModelType, TranscodeType>
         this.bitmapPool = other.glide.getBitmapPool();
         this.decodeFormat =  other.glide.getDecodeFormat();
 
-        imageDecoder = new StreamBitmapDecoder(bitmapPool, decodeFormat);
+        imageDecoder = new StreamBitmapDecoder(bitmapPool,decodeFormat);
         videoDecoder = new FileDescriptorBitmapDecoder(bitmapPool, decodeFormat);
     }
 
@@ -73,7 +73,7 @@ public class BitmapRequestBuilder<ModelType, TranscodeType>
     }
 
     /**
-     * Load images at their original size using {@link Downsampler#NONE}.
+     * Load images at their original size using {@link Downsampler#}.
      *
      * @see #downsample(Downsampler)
      *
@@ -97,7 +97,7 @@ public class BitmapRequestBuilder<ModelType, TranscodeType>
 
     /**
      * Load images using the given {@link Downsampler}. Replaces any existing image decoder. Defaults to
-     * {@link Downsampler#AT_LEAST}. Will be ignored if the data represented by the model is a video. This replaces any
+     * {. Will be ignored if the data represented by the model is a video. This replaces any
      * previous calls to {@link #imageDecoder(ResourceDecoder)}  and {@link #decoder(ResourceDecoder)} with default
      * decoders with the appropriate options set.
      *

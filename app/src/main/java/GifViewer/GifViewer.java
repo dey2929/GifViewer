@@ -2,6 +2,7 @@ package GifViewer;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -10,11 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import java.io.File;
@@ -23,6 +21,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 import GifViewer.load.DecodeFormat;
 import GifViewer.load.data.InputStreamRewinder;
@@ -38,40 +37,72 @@ import GifViewer.load.model.ByteBufferEncoder;
 import GifViewer.load.model.ByteBufferFileLoader;
 import GifViewer.load.model.DataUrlLoader;
 import GifViewer.load.model.FileLoader;
+import GifViewer.load.model.GenericLoaderFactory;
 import GifViewer.load.model.GlideUrl;
+import GifViewer.load.model.ImageVideoWrapper;
 import GifViewer.load.model.MediaStoreFileLoader;
+import GifViewer.load.model.ModelLoaderFactory;
 import GifViewer.load.model.ResourceLoader;
 import GifViewer.load.model.StreamEncoder;
 import GifViewer.load.model.StringLoader;
 import GifViewer.load.model.UnitModelLoader;
 import GifViewer.load.model.UriLoader;
 import GifViewer.load.model.UrlUriLoader;
+import GifViewer.load.model.file_descriptor.FileDescriptorFileLoader;
+import GifViewer.load.model.file_descriptor.FileDescriptorResourceLoader;
+import GifViewer.load.model.file_descriptor.FileDescriptorStringLoader;
+import GifViewer.load.model.file_descriptor.FileDescriptorUriLoader;
 import GifViewer.load.model.stream.HttpGlideUrlLoader;
 import GifViewer.load.model.stream.HttpUriLoader;
+import GifViewer.load.model.stream.HttpUrlGlideUrlLoader;
 import GifViewer.load.model.stream.MediaStoreImageThumbLoader;
 import GifViewer.load.model.stream.MediaStoreVideoThumbLoader;
+import GifViewer.load.model.stream.StreamByteArrayLoader;
+import GifViewer.load.model.stream.StreamFileLoader;
+import GifViewer.load.model.stream.StreamResourceLoader;
+import GifViewer.load.model.stream.StreamStringLoader;
+import GifViewer.load.model.stream.StreamUriLoader;
+import GifViewer.load.model.stream.StreamUrlLoader;
 import GifViewer.load.model.stream.UrlLoader;
 import GifViewer.load.resource.bitmap.BitmapDrawableDecoder;
 import GifViewer.load.resource.bitmap.BitmapDrawableEncoder;
 import GifViewer.load.resource.bitmap.BitmapEncoder;
 import GifViewer.load.resource.bitmap.ByteBufferBitmapDecoder;
+import GifViewer.load.resource.bitmap.CenterCrop;
 import GifViewer.load.resource.bitmap.Downsampler;
+import GifViewer.load.resource.bitmap.FileDescriptorBitmapDataLoadProvider;
+import GifViewer.load.resource.bitmap.FitCenter;
+import GifViewer.load.resource.bitmap.GlideBitmapDrawable;
+import GifViewer.load.resource.bitmap.ImageVideoDataLoadProvider;
+import GifViewer.load.resource.bitmap.StreamBitmapDataLoadProvider;
 import GifViewer.load.resource.bitmap.StreamBitmapDecoder;
 import GifViewer.load.resource.bitmap.VideoBitmapDecoder;
 import GifViewer.load.resource.bytes.ByteBufferRewinder;
+import GifViewer.load.resource.drawable.GlideDrawable;
 import GifViewer.load.resource.file.FileDecoder;
+import GifViewer.load.resource.file.StreamFileDataLoadProvider;
 import GifViewer.load.resource.gif.ByteBufferGifDecoder;
 import GifViewer.load.resource.gif.GifDrawable;
 import GifViewer.load.resource.gif.GifDrawableEncoder;
+import GifViewer.load.resource.gif.GifDrawableLoadProvider;
 import GifViewer.load.resource.gif.GifFrameResourceDecoder;
 import GifViewer.load.resource.gif.StreamGifDecoder;
+import GifViewer.load.resource.gifbitmap.GifBitmapWrapper;
+import GifViewer.load.resource.gifbitmap.GifBitmapWrapperTransformation;
+import GifViewer.load.resource.gifbitmap.ImageVideoGifDrawableLoadProvider;
 import GifViewer.load.resource.transcode.BitmapBytesTranscoder;
 import GifViewer.load.resource.transcode.BitmapDrawableTranscoder;
+import GifViewer.load.resource.transcode.GifBitmapWrapperDrawableTranscoder;
 import GifViewer.load.resource.transcode.GifDrawableBytesTranscoder;
+import GifViewer.load.resource.transcode.GlideBitmapDrawableTranscoder;
+import GifViewer.load.resource.transcode.ResourceTranscoder;
+import GifViewer.load.resource.transcode.TranscoderRegistry;
 import GifViewer.manager.ConnectivityMonitorFactory;
 import GifViewer.manager.RequestManagerRetriever;
 import GifViewer.module.GlideModule;
 import GifViewer.module.ManifestParser;
+import GifViewer.provider.DataLoadProvider;
+import GifViewer.provider.DataLoadProviderRegistry;
 import GifViewer.request.RequestOptions;
 import GifViewer.request.target.ImageViewTargetFactory;
 import GifViewer.request.target.Target;
@@ -86,6 +117,13 @@ public class GifViewer implements ComponentCallbacks2
     private static final String TAG = "Glide";
     private static volatile GifViewer gifViewer;
 
+    private  CenterCrop bitmapCenterCrop;
+    private  FitCenter bitmapFitCenter;
+    private GifBitmapWrapperTransformation drawableFitCenter;
+    private Handler mainHandler;
+    private DecodeFormat decodeFormat;
+    private GifBitmapWrapperTransformation drawableCenterCrop;
+    private final DataLoadProviderRegistry dataLoadProviderRegistry = new DataLoadProviderRegistry();
     private final Engine engine;
     private final BitmapPool bitmapPool;
     private final MemoryCache memoryCache;
@@ -95,6 +133,8 @@ public class GifViewer implements ComponentCallbacks2
     private final ArrayPool arrayPool;
     private final ConnectivityMonitorFactory connectivityMonitorFactory;
     private final List<RequestManager> managers = new ArrayList<>();
+    private final GenericLoaderFactory loaderFactory;
+    private final TranscoderRegistry transcoderRegistry = new TranscoderRegistry();
 
     /**
      * Returns a directory with a default name in the private cache directory of the application to
@@ -106,6 +146,10 @@ public class GifViewer implements ComponentCallbacks2
 
     public static File getPhotoCacheDir(Context context) {
         return getPhotoCacheDir(context, DEFAULT_DISK_CACHE_DIR);
+    }
+
+    <T, Z> DataLoadProvider<T, Z> buildDataProvider(Class<T> dataClass, Class<Z> decodedClass) {
+        return dataLoadProviderRegistry.get(dataClass, decodedClass);
     }
 
     /**
@@ -160,7 +204,7 @@ public class GifViewer implements ComponentCallbacks2
         return gifViewer;
     }
 
-    @VisibleForTesting
+
     public static void tearDown() {
         gifViewer = null;
     }
@@ -271,6 +315,65 @@ public class GifViewer implements ComponentCallbacks2
                 defaultRequestOptions, engine, this, logLevel);
     }
 
+    GifViewer(Engine engine, MemoryCache memoryCache, BitmapPool bitmapPool, Context context, DecodeFormat decodeFormat) {
+        this.engine = engine;
+        this.bitmapPool = bitmapPool;
+        this.memoryCache = memoryCache;
+        this.decodeFormat = decodeFormat;
+        this.loaderFactory = new GenericLoaderFactory(context);
+        mainHandler = new Handler(Looper.getMainLooper());
+        bitmapPreFiller = new BitmapPreFiller(memoryCache, bitmapPool, decodeFormat);
+
+        dataLoadProviderRegistry = new DataLoadProviderRegistry();
+
+        StreamBitmapDataLoadProvider streamBitmapLoadProvider =
+                new StreamBitmapDataLoadProvider(bitmapPool, decodeFormat);
+        dataLoadProviderRegistry.register(InputStream.class, Bitmap.class, streamBitmapLoadProvider);
+
+        FileDescriptorBitmapDataLoadProvider fileDescriptorLoadProvider =
+                new FileDescriptorBitmapDataLoadProvider(bitmapPool, decodeFormat);
+        dataLoadProviderRegistry.register(ParcelFileDescriptor.class, Bitmap.class, fileDescriptorLoadProvider);
+
+        ImageVideoDataLoadProvider imageVideoDataLoadProvider =
+                new ImageVideoDataLoadProvider(streamBitmapLoadProvider, fileDescriptorLoadProvider);
+        dataLoadProviderRegistry.register(ImageVideoWrapper.class, Bitmap.class, imageVideoDataLoadProvider);
+
+        GifDrawableLoadProvider gifDrawableLoadProvider =
+                new GifDrawableLoadProvider(context, bitmapPool);
+        dataLoadProviderRegistry.register(InputStream.class, GifDrawable.class, gifDrawableLoadProvider);
+
+        dataLoadProviderRegistry.register(ImageVideoWrapper.class, GifBitmapWrapper.class,
+                new ImageVideoGifDrawableLoadProvider(imageVideoDataLoadProvider, gifDrawableLoadProvider, bitmapPool));
+
+        dataLoadProviderRegistry.register(InputStream.class, File.class, new StreamFileDataLoadProvider());
+
+        register(File.class, ParcelFileDescriptor.class, new FileDescriptorFileLoader.Factory());
+        register(File.class, InputStream.class, new StreamFileLoader.Factory());
+        register(int.class, ParcelFileDescriptor.class, new FileDescriptorResourceLoader.Factory());
+        register(int.class, InputStream.class, new StreamResourceLoader.Factory());
+        register(Integer.class, ParcelFileDescriptor.class, new FileDescriptorResourceLoader.Factory());
+        register(Integer.class, InputStream.class, new StreamResourceLoader.Factory());
+        register(String.class, ParcelFileDescriptor.class, new FileDescriptorStringLoader.Factory());
+        register(String.class, InputStream.class, new StreamStringLoader.Factory());
+        register(Uri.class, ParcelFileDescriptor.class, new FileDescriptorUriLoader.Factory());
+        register(Uri.class, InputStream.class, new StreamUriLoader.Factory());
+        register(URL.class, InputStream.class, new StreamUrlLoader.Factory());
+        register(GlideUrl.class, InputStream.class, new HttpUrlGlideUrlLoader.Factory());
+        register(byte[].class, InputStream.class, new StreamByteArrayLoader.Factory());
+
+        transcoderRegistry.register(Bitmap.class, GlideBitmapDrawable.class,
+                new GlideBitmapDrawableTranscoder(context.getResources(), bitmapPool));
+        transcoderRegistry.register(GifBitmapWrapper.class, GlideDrawable.class,
+                new GifBitmapWrapperDrawableTranscoder(
+                        new GlideBitmapDrawableTranscoder(context.getResources(), bitmapPool)));
+
+        bitmapCenterCrop = new CenterCrop(bitmapPool);
+        drawableCenterCrop = new GifBitmapWrapperTransformation(bitmapPool, bitmapCenterCrop);
+
+        bitmapFitCenter = new FitCenter(bitmapPool);
+        drawableFitCenter = new GifBitmapWrapperTransformation(bitmapPool, bitmapFitCenter);
+    }
+
     /**
      * Returns the {@link GifViewer.load.engine.bitmap_recycle.BitmapPool} used to
      * temporarily store {@link android.graphics.Bitmap}s so they can be reused to avoid garbage
@@ -311,6 +414,12 @@ public class GifViewer implements ComponentCallbacks2
 
     GlideContext getGlideContext() {
         return glideContext;
+    }
+    public <T, Y> void register(Class<T> modelClass, Class<Y> resourceClass, ModelLoaderFactory<T, Y> factory) {
+        ModelLoaderFactory<T, Y> removed = loaderFactory.register(modelClass, resourceClass, factory);
+        if (removed != null) {
+            removed.teardown();
+        }
     }
 
     /**
@@ -416,12 +525,7 @@ public class GifViewer implements ComponentCallbacks2
      * <p> This method is appropriate for resources that will be used outside of the normal fragment
      * or activity lifecycle (For example in services, or for notification thumbnails). </p>
      *
-     * @param context Any context, will not be retained.
-     * @return A RequestManager for the top level application that can be used to start a load.
-     * @see #with(android.app.Activity)
-     * @see #with(android.app.Fragment)
-     * @see #with(android.support.v4.app.Fragment)
-     * @see #with(android.support.v4.app.FragmentActivity)
+
      */
     public static RequestManager with(Context context) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();
@@ -442,8 +546,6 @@ public class GifViewer implements ComponentCallbacks2
 
     /**
      * Begin a load with Glide that will tied to the give
-     * {@link android.support.v4.app.FragmentActivity}'s lifecycle and that uses the given
-     * {@link android.support.v4.app.FragmentActivity}'s default options.
      *
      * @param activity The activity to use.
      * @return A RequestManager for the given FragmentActivity that can be used to start a load.
@@ -461,15 +563,14 @@ public class GifViewer implements ComponentCallbacks2
      * @return A RequestManager for the given Fragment that can be used to start a load.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static RequestManager with(android.app.Fragment fragment) {
+    public static RequestManager with(Fragment fragment) {
         RequestManagerRetriever retriever = RequestManagerRetriever.get();
         return retriever.get(fragment);
     }
 
     /**
      * Begin a load with Glide that will be tied to the given
-     * {@link android.support.v4.app.Fragment}'s lifecycle and that uses the given
-     * {@link android.support.v4.app.Fragment}'s default options.
+     *
      *
      * @param fragment The fragment to use.
      * @return A RequestManager for the given Fragment that can be used to start a load.
@@ -525,6 +626,38 @@ public class GifViewer implements ComponentCallbacks2
     @Override
     public void onLowMemory() {
         clearMemory();
+    }
+
+    Engine getEngine() {
+        return engine;
+    }
+
+    CenterCrop getBitmapCenterCrop() {
+        return bitmapCenterCrop;
+    }
+
+    FitCenter getBitmapFitCenter() {
+        return bitmapFitCenter;
+    }
+
+    GifBitmapWrapperTransformation getDrawableCenterCrop() {
+        return drawableCenterCrop;
+    }
+
+    GifBitmapWrapperTransformation getDrawableFitCenter() {
+        return drawableFitCenter;
+    }
+
+    Handler getMainHandler() {
+        return mainHandler;
+    }
+
+    DecodeFormat getDecodeFormat() {
+        return decodeFormat;
+    }
+
+    <Z, R> ResourceTranscoder<Z, R> buildTranscoder(Class<Z> decodedClass, Class<R> transcodedClass) {
+        return transcoderRegistry.get(decodedClass, transcodedClass);
     }
 }
 

@@ -60,6 +60,17 @@ public final class Downsampler {
               )
           )
       );
+  public static final Downsampler AT_LEAST = new Downsampler() {
+
+    protected int getSampleSize(int inWidth, int inHeight, int outWidth, int outHeight) {
+      return Math.min(inHeight / outHeight, inWidth / outWidth);
+    }
+
+
+    public String getId() {
+      return "AT_LEAST.com.bumptech.glide.load.data.bitmap";
+    }
+  };
   private static final DecodeCallbacks EMPTY_CALLBACKS = new DecodeCallbacks() {
     @Override
     public void onObtainBounds() {

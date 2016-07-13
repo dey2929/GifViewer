@@ -1,13 +1,13 @@
 package GifViewer;
 
+import java.io.InputStream;
+
 import GifViewer.load.model.ModelLoader;
 import GifViewer.load.resource.gif.GifDrawable;
 import GifViewer.load.resource.transcode.GifDrawableBytesTranscoder;
 import GifViewer.load.resource.transcode.ResourceTranscoder;
 import GifViewer.provider.DataLoadProvider;
 import GifViewer.provider.FixedLoadProvider;
-
-import java.io.InputStream;
 
 /**
  * A class for creating a load request that either loads an {@link GifViewer.load.resource.gif.GifDrawable}
@@ -21,7 +21,7 @@ public class GifTypeRequest<ModelType> extends GifRequestBuilder<ModelType> {
     private final ModelLoader<ModelType, InputStream> streamModelLoader;
     private final RequestManager.OptionsApplier optionsApplier;
 
-    private static <A, R> FixedLoadProvider<A, InputStream, GifDrawable, R> buildProvider(GifViewer gifViewer,
+    private static <A, R> FixedLoadProvider<A, InputStream, GifDrawable, R> buildProvider(GifViewer glide,
             ModelLoader<A, InputStream> streamModelLoader, Class<R> transcodeClass,
             ResourceTranscoder<GifDrawable, R> transcoder) {
         if (streamModelLoader == null) {

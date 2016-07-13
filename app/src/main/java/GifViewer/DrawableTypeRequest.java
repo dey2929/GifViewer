@@ -2,6 +2,10 @@ package GifViewer;
 
 import android.content.Context;
 import android.os.ParcelFileDescriptor;
+
+import java.io.File;
+import java.io.InputStream;
+
 import GifViewer.load.model.ImageVideoModelLoader;
 import GifViewer.load.model.ImageVideoWrapper;
 import GifViewer.load.model.ModelLoader;
@@ -14,9 +18,6 @@ import GifViewer.provider.DataLoadProvider;
 import GifViewer.provider.FixedLoadProvider;
 import GifViewer.request.FutureTarget;
 import GifViewer.request.target.Target;
-
-import java.io.File;
-import java.io.InputStream;
 
 /**
  * A class for creating a load request that loads either an animated GIF drawable or a Bitmap drawable directly, or
@@ -51,7 +52,7 @@ public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<Model
     }
 
     DrawableTypeRequest(Class<ModelType> modelClass, ModelLoader<ModelType, InputStream> streamModelLoader,
-            ModelLoader<ModelType, ParcelFileDescriptor> fileDescriptorModelLoader, Context context, Glide glide,
+            ModelLoader<ModelType, ParcelFileDescriptor> fileDescriptorModelLoader, Context context, GifViewer glide,
             RequestTracker requestTracker, Lifecycle lifecycle, RequestManager.OptionsApplier optionsApplier) {
         super(context, modelClass,
                 buildProvider(glide, streamModelLoader, fileDescriptorModelLoader, GifBitmapWrapper.class,
@@ -77,7 +78,7 @@ public class DrawableTypeRequest<ModelType> extends DrawableRequestBuilder<Model
      * <p>
      *     If the underlying data is not a GIF, this will fail. As a result, this should only be used if the model
      *     represents an animated GIF and the caller wants to interact with the GIfDrawable directly. Normally using
-     *     just an {@link GifViewer.DrawableTypeRequest} is sufficient because it will determine whether or
+     *     just an {} is sufficient because it will determine whether or
      *     not the given data represents an animated GIF and return the appropriate animated or not animated
      *     {@link android.graphics.drawable.Drawable} automatically.
      * </p>
